@@ -2,11 +2,13 @@ const MongoDB = require('mongodb');
 const mongoClient = MongoDB.MongoClient;
 const clear = require('clear');
 const readline = require('readline');
+const { count } = require('console');
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
 
 mongoClient.connect(`mongodb://localhost:27017/crunchbase`, (error, db) => {
 
-  if (error) { console.log('Error trying to connect to the Database:', error) } else { console.log('Connection established correctly!! 😬');
+  if (error) { console.log('Error trying to connect to the Database:', error) } else {
+    console.log('Connection established correctly!! 😬');
 
     function mainMenu() {
       clear();
@@ -54,6 +56,108 @@ mongoClient.connect(`mongodb://localhost:27017/crunchbase`, (error, db) => {
             break;
 
           // Code here next cases!
+          case "4":
+            // 4.- List by name all companies founded in frebuary of 2004
+            db.collection('companies').find({ "funding_rounds.funded_year": 2004 }, { name: 1, _id: 0 }).toArray((error, result) => {
+              if (error) {
+                console.log(error);
+                rl.question(`\nType enter to continue: `, (answer) => { mainMenu() });
+              } else {
+                console.log(result);
+                rl.question(`\nType enter to continue: `, (answer) => { mainMenu() });
+              }
+            })
+            break;
+          case "5":
+            // 5.- List by name  all companies  founded in the summer of 2004(april or june) sorted by date.
+            db.collection('companies').find({ $and: [{ founded_year: 2004 }, { $or: [{ founded_month: 4 }, { founded_month: 6 }] }] }, { name: 1, _id: 0 }).sort({ founded_month: 1 }).toArray((error, result) => {
+              if (error) {
+                console.log(error);
+                rl.question(`\nType enter to continue: `, (answer) => { mainMenu() });
+              } else {
+                console.log(result);
+                rl.question(`\nType enter to continue: `, (answer) => { mainMenu() });
+              }
+            })
+            break;
+          case "6":
+            // 6 what companies have offices in "Barcelona"
+            db.collection('companies').find({ 'offices.city': "Barcelona" }, { name: 1, _id: 0 }).count((error, result) => {
+              if (error) {
+                console.log(error);
+                rl.question(`\nType enter to continue: `, (answer) => { mainMenu() });
+              } else {
+                console.log(result);
+                rl.question(`\nType enter to continue: `, (answer) => { mainMenu() });
+              }
+            })
+            break;
+          case "7":
+            // 7 list  the 10 companies with  more employees sorted ascending(show name and empleyees)
+            db.collection('companies').find({}, { name: 1, _id: 0, number_of_employees: 1 }).limit(10).sort({ number_of_employees: -1 }).toArray((error, result) => {
+              if (error) {
+                console.log(error);
+                rl.question(`\nType enter to continue: `, (answer) => { mainMenu() });
+              } else {
+                console.log(result);
+                rl.question(`\nType enter to continue: `, (answer) => { mainMenu() });
+              }
+            })
+            break;
+          case "8":
+            // 8.- Find the company with name "Facebook"
+            db.collection('companies').find({ name: "Facebook" }, { name: 1, _id: 0 }).count((error, result) => {
+              if (error) {
+                console.log(error);
+                rl.question(`\nType enter to continue: `, (answer) => { mainMenu() });
+              } else {
+                console.log(result);
+                rl.question(`\nType enter to continue: `, (answer) => { mainMenu() });
+              }
+            })
+            break;
+
+          case "9":
+            // 9.- How many the company with name "Facebook"
+            db.collection('companies').find({ name: "Facebook" }, { name: 1, number_of_employees: 1, _id: 0 }).toArray((error, result) => {
+              if (error) {
+                console.log(error);
+                rl.question(`\nType enter to continue: `, (answer) => { mainMenu() });
+              } else {
+                console.log(result);
+                rl.question(`\nType enter to continue: `, (answer) => { mainMenu() });
+              }
+            })
+            break;
+
+          case "10":
+            // 10.- List the name of all the products of Facebook 
+            db.collection('companies').find({ name: "Facebook" }, { name: 1, number_of_employees: 1, "products.name": 1, _id: 0 }
+            ).toArray((error, result) => {
+              if (error) {
+                console.log(error);
+                rl.question(`\nType enter to continue: `, (answer) => { mainMenu() });
+              } else {
+                for (i = 0; i < result.length; i++) {
+                  console.log(result[i].name);
+                }
+                rl.question(`\nType enter to continue: `, (answer) => { mainMenu() });
+              }
+            })
+            break;
+          case "11":
+            // 11.- List the people that are working at facebook right now (check relationships field) 
+            db.collection('companies').find({ name: "Facebook" }, { name: 1, number_of_employees: 1, _id: 0 }).toArray((error, result) => {
+              if (error) {
+                console.log(error);
+                rl.question(`\nType enter to continue: `, (answer) => { mainMenu() });
+              } else {
+                console.log(result);
+                rl.question(`\nType enter to continue: `, (answer) => { mainMenu() });
+              }
+            })
+            break;
+
         }
       });
     }
